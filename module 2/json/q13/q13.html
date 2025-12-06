@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes App</title>
+</head>
+<body>
+
+    <h2>My Notes</h2>
+
+    <!-- Textarea where user enters notes -->
+    <textarea id="notes" rows="10" cols="40" placeholder="Write your notes here..."></textarea>
+    <br><br>
+
+    <!-- Buttons -->
+    <button id="saveBtn">Save Notes</button>
+    <button id="loadBtn">Load Notes</button>
+    <button id="clearBtn">Clear Notes</button>
+
+    <script>
+        // -------- Load notes automatically on page load --------
+        window.addEventListener("load", function () {
+            let saved = localStorage.getItem("mynotes");
+
+            // If notes exist in localStorage → display them
+            if (saved) {
+                document.getElementById("notes").value = saved;
+            }
+        });
+
+        // -------- Save button click --------
+        document.getElementById("saveBtn").addEventListener("click", function () {
+            let text = document.getElementById("notes").value.trim();
+
+            // Validation → do not save empty notes
+            if (text === "") {
+                alert("Cannot save empty notes!");
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem("mynotes", text);
+            alert("Notes saved!");
+        });
+
+        // -------- Load button click --------
+        document.getElementById("loadBtn").addEventListener("click", function () {
+            let saved = localStorage.getItem("mynotes");
+
+            if (saved) {
+                document.getElementById("notes").value = saved;
+            } else {
+                alert("No notes found!");
+            }
+        });
+
+        // -------- Clear button click --------
+        document.getElementById("clearBtn").addEventListener("click", function () {
+            localStorage.removeItem("mynotes");
+            document.getElementById("notes").value = "";
+            alert("Notes cleared!");
+        });
+    </script>
+
+</body>
+</html>

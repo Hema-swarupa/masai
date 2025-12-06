@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enhanced Todo List</title>
+    <style>
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Enhanced Todo List</h2>
+
+    <!-- Input for adding new tasks -->
+    <input id="taskInput" type="text" placeholder="Enter a task">
+    <button id="addBtn">Add Task</button>
+
+    <br><br>
+
+    <!-- Search bar -->
+    <input id="searchInput" type="text" placeholder="Search tasks...">
+
+    <ul id="taskList"></ul>
+
+    <script>
+
+        // ----------- GLOBAL TASK ARRAY -----------
+        let tasks = [];
+
+        // Load tasks from localStorage on page load
+        window.addEventListener("load", function () {
+            let saved = localStorage.getItem("todos");
+
+            if (saved) {
+                tasks = JSON.parse(saved);  // convert JSON → array
+                renderTasks(tasks);
+            }
+        });
+
+        // ----------- ADD NEW TASK -----------
+        document.getElementById("addBtn").addEventListener("click", function () {
+            let text = document.getElementById("taskInput").value.trim();
+
+            if (text === "") {
+                alert("Task cannot be empty!");
+                return;
+            }
+
+            // Create task object
+            let newTask = {
+                id: Date.now(),        // unique ID
+                text: text,
+                completed: false
+            };
+
+            tasks.push(newTask);
+            saveTasks();
+            renderTasks(tasks);
+
+            document.getElementById("taskInput").value = "";
+        });
+
+        // ----------- SAVE TO LOCALSTORAGE -----------
+        function saveTasks() {
+            localStorage.setItem("todos", JSON.stringify(tasks));
+        }
+
+        // ----------- RENDER TASKS -----------
+        function renderTasks(taskArray) {
+            let ul = document.getElementById("taskList");
+            ul.innerHTML = ""; // clear old UI
+
+            taskArray.forEach(task => {
+
+                let li = document.createElement("li");
+                li.textContent = task.text;
+
+                // Apply completed style
+                if (task.completed) {
+                    li.classList.add("completed");
+                }
+
+                // Toggle complete on click
+                li.addEventListener("click", function () {
+                    task.completed = !task.completed;
+                    saveTasks();
+                    renderTasks(tasks);
+                });
+
+                // Delete button
+                let delBtn = document.createElement("button");
+                delBtn.textContent = "Delete";
+                delBtn.style.marginLeft = "10px";
+
+                delBtn.addEventListener("click", function (event) {
+                    event.stopPropagation(); // Prevent triggering complete toggle
+
+                    tasks = tasks.filter(t => t.id !== task.id);
+                    saveTasks();
+                    renderTasks(tasks);
+                });
+
+                li.appendChild(delBtn);
+                ul.appendChild(li);
+            });
+        }
+
+        // ----------- SEARCH TASKS -----------
+        document.getElementById("searchInput").addEventListener("input", function () {
+            let text = this.value.toLowerCase();
+
+            let filtered = tasks.filter(task =>
+                task.text.toLowerCase().includes(text)
+            );
+
+            renderTasks(filtered);
+        });
+
+    </script>
+
+</body>
+</html>
